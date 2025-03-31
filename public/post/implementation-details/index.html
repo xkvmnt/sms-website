@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto">
+
+<head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="noindex, nofollow">
+<title>Implementation Details | IVAR Project SMS</title>
+<meta name="keywords" content="">
+<meta name="description" content="IMPORTANT NOTE: Since I incorporated a few assets from the original game, it is important to clarify upfront that all rights to the assets and also any images used in this project are reserved by Nintendo. This project was created solely for study and learning purposes and will not be used for any commercial activities.
+1. Locomotion Implementation
+The initial idea for the locomotion technique was to implement the Hover Nozzle as the first movement ability. However, for this to work, the user first needed a way to gain height before activating the hover. To achieve this, I decided to implement a classic Mario-style jump.">
+<meta name="author" content="">
+<link rel="canonical" href="http://localhost:1313/post/implementation-details/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.f49d66caae9ea0fd43f21f29e71a8d3e284517ed770f2aa86fa012953ad3c9ef.css" integrity="sha256-9J1myq6eoP1D8h8p5xqNPihFF&#43;13Dyqob6ASlTrTye8=" rel="preload stylesheet" as="style">
+<link rel="icon" href="http://localhost:1313/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="http://localhost:1313/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="http://localhost:1313/favicon-32x32.png">
+<link rel="apple-touch-icon" href="http://localhost:1313/apple-touch-icon.png">
+<link rel="mask-icon" href="http://localhost:1313/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="http://localhost:1313/post/implementation-details/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-track {
+                background: 0 0;
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-thumb {
+                border-color: var(--theme);
+            }
+        }
+
+    </style>
+</noscript>
+</head>
+
+<body class="" id="top">
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.body.classList.add('dark');
+    } else if (localStorage.getItem("pref-theme") === "light") {
+        document.body.classList.remove('dark')
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.body.classList.add('dark');
+    }
+
+</script>
+
+<header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="http://localhost:1313/" accesskey="h" title="IVAR Project SMS (Alt + H)">IVAR Project SMS</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    
+    <h1 class="post-title entry-hint-parent">
+      Implementation Details
+    </h1>
+    <div class="post-meta">7 min
+
+</div>
+  </header> 
+  <div class="post-content"><p><strong>IMPORTANT NOTE:</strong> Since I incorporated a few assets from the original game, it is important to clarify upfront that all rights to the assets and also any images used in this project are reserved by Nintendo. This project was created solely for study and learning purposes and will not be used for any commercial activities.</p>
+<h1 id="1-locomotion-implementation"><strong>1. Locomotion Implementation</strong><a hidden class="anchor" aria-hidden="true" href="#1-locomotion-implementation">#</a></h1>
+<p>The initial idea for the locomotion technique was to implement the <strong>Hover Nozzle</strong> as the first movement ability. However, for this to work, the user first needed a way to gain height before activating the hover. To achieve this, I decided to implement a classic Mario-style jump.</p>
+<p>To execute this, the code tracks the position of either controller. If one of the controllers moves above the position of the head-mounted display (HMD), a positive velocity is applied to the player&rsquo;s Rigidbody, propelling them into the air - mimicking the Mario jump gesture. Unity’s physics engine then naturally counteracts this movement with gravity, causing the player to slow down and eventually fall back to their initial position as a negative velocity is applied.</p>
+<figure>
+    <img loading="lazy" src="/images/code/jump.png" width="500px"/> 
+</figure>
+
+<p>If the controller positions are then registered to be under the HMD again the ability to jump is then reset to prevent the player from spamming the jump action and gaining infinite height.</p>
+<p>After implementing the jumping gesture, the next step was to develop the hovering mechanic. The code first checks if the player&rsquo;s Y-position is above zero - if so, hovering becomes available. if the player now presses both of the triggers on the controllers he is able to activate the hovering.</p>
+<p>For the hovering logic itself, the player&rsquo;s downward velocity is nullified. This effectively counteracts gravity, allowing the player to stay in the air. To control the direction of movement while hovering, the user can tilt both controllers. The code then calculates the average tilt of both controllers and applies the resulting directional force to the player&rsquo;s transform, adjusting movement relative to the HMD’s orientation. This allows the user to smoothly navigate the 3D world while hovering.</p>
+<h3 id="turbo-nozzle"><strong>Turbo Nozzle</strong><a hidden class="anchor" aria-hidden="true" href="#turbo-nozzle">#</a></h3>
+<p>Since the Hover Nozzle is primarily designed for hovering and does not provide significant forward momentum, the Turbo Nozzle was implemented as a way to move quickly while on the ground.</p>
+<figure>
+    <img loading="lazy" src="/images/code/boost.png" width="500px"/> 
+</figure>
+
+<p>The Turbo Nozzle operates similarly to the hovering mechanic but with some key differences. It only considers the left and right tilt of the controllers to determine the movement direction. Additionally, the Turbo Nozzle applies a higher movement speed to the player&rsquo;s transform, resulting in significantly faster and more dynamic movement across the ground.</p>
+<h3 id="rocket-nozzle"><strong>Rocket Nozzle</strong><a hidden class="anchor" aria-hidden="true" href="#rocket-nozzle">#</a></h3>
+<p>The Rocket Jump functions similarly to the jumping gesture, but without requiring a physical gesture. Instead, when the player holds both triggers, a timer starts counting. If the threshold value is surpassed, a powerful upward force is applied to the player&rsquo;s Rigidbody.</p>
+<figure>
+    <img loading="lazy" src="/images/code/rocketjump.png" width="500px"/> 
+</figure>
+
+<p>To differentiate the Rocket Jump from the standard jump, it applies significantly more force, launching the player much higher into the air.</p>
+<h3 id="water-tank"><strong>Water Tank</strong><a hidden class="anchor" aria-hidden="true" href="#water-tank">#</a></h3>
+<p>The water tank mechanic was implemented using an internal float variable, which is initially set to 100. Each time the user activates an ability, this value decreases accordingly. For all nozzles, the water level gradually decreases while in use. However, for the Rocket Jump, water consumption occurs in a burst, reducing the tank by 20 units per use. Before executing a Rocket Jump, the code checks whether the current water level is at least 20 to ensure the action can be performed.</p>
+<p>Once the water level reaches 0, the player is unable to use any abilities until the tank is refilled. To replenish the water supply, the player must stand in a water source, restoring their ability to use the FLUDD nozzles. To implement this, a water pond prefab was created, consisting of a cube and a water surface prefab. This object was assigned the &ldquo;waterSource&rdquo; tag, allowing the code to recognize if the player is in a refillable area.</p>
+<figure>
+    <img loading="lazy" src="/images/code/waterrefilling.png" width="350px"/> 
+</figure>
+
+<p>Using the OnTriggerStay function, the player&rsquo;s collider checks for contact with an object tagged as &ldquo;waterSource&rdquo;. If the player remains within the water source, the water tank value gradually increases, allowing them to refill and continue using FLUDD’s abilities.</p>
+<p>Several water ponds have been strategically placed around the course, allowing players to refill their water tank when needed. In case a player runs out of water and gets stuck, pressing the reset button will automatically respawn them in a water source, ensuring their water tank is refilled and they can continue playing without frustration.</p>
+<p>After implementing the logic for all movement nozzles the ability to cycle through them has been added. Players can switch between nozzles by pressing the A-button on the right controller, allowing them to seamlessly swap abilities as needed.</p>
+<figure>
+    <img loading="lazy" src="/images/code/cyclenozzles.png" width="600px"/> 
+</figure>
+
+<h1 id="2-interaction-implementation"><strong>2. Interaction Implementation</strong><a hidden class="anchor" aria-hidden="true" href="#2-interaction-implementation">#</a></h1>
+<h3 id="spraying-nozzle"><strong>Spraying Nozzle</strong><a hidden class="anchor" aria-hidden="true" href="#spraying-nozzle">#</a></h3>
+<p>For the interaction technique, I opted for a more fun and dynamic approach rather than a precise object manipulation implementation. Instead of allowing the player to precisely adjust an object&rsquo;s position and orientation, I focused on replicating the spraying nozzle from Super Mario Sunshine.</p>
+<p>The spraying nozzle mechanic was implemented using a Line Renderer to simulate the arc of sprayed water. The parabolic trajectory of the water stream was achieved through interpolation and a parabola formula.</p>
+<p>The function CalculateArcPoint determines the position of each point along the arc by linearly interpolating between the start and end positions while applying a parabolic offset to create the arch effect.
+<figure>
+    <img loading="lazy" src="/images/code/calculatearcpoint.png" width="500px"/> 
+</figure>
+
+The arc visualization is then generated using a for loop that iterates through a set number of points, calculating each one using CalculateArcPoint, and updating the Line Renderer.
+<figure>
+    <img loading="lazy" src="/images/code/generatearcpoints.png" width="500px"/> 
+</figure>
+
+To actually move an object the water spray applies force to the object it hits. If the raycast detects a collision with an object that has a Rigidbody, force is applied in the direction of the spray, resulting in the object being pushed.
+<figure>
+    <img loading="lazy" src="/images/code/spray_hit.png" width="500px"/> 
+</figure>
+</p>
+<h3 id="interaction-tasks"><strong>Interaction Tasks</strong><a hidden class="anchor" aria-hidden="true" href="#interaction-tasks">#</a></h3>
+<p>To create fun and engaging interaction tasks, the original tasks on the map were redesigned. Using ProBuilder, I modeled various structures within Unity to serve as interactive elements creating small mini games the player has to solve to progress through the course. The first task features a giant cube marked with a red cross, indicating that the player must push it using the spraying nozzle. The cube was placed inside a tunnel structure, blocking the player’s path. By successfully pushing the cube forward, the tunnel opens up, allowing the player to proceed through the course.
+<figure class="align-center ">
+    <img loading="lazy" src="/images/implementation/interaction1.png#center" width="500px"/> 
+</figure>
+</p>
+<p>The second interaction task involves a giant wooden board positioned near a large gap. To progress, the player must use the spraying nozzle to push the board over the gap, creating a makeshift bridge that allows them to cross safely.
+<figure class="align-center ">
+    <img loading="lazy" src="/images/implementation/interaction2.png#center" width="500px"/> 
+</figure>
+
+For the third task I designed a small obstacle course for the player to push a ball through using the spraying nozzle. At the end of the course, there is a pit - if the player successfully guides the ball into the pit, the wall blocking the final checkpoint disappears, allowing them to pass through and complete the parkour course.
+<figure class="align-center ">
+    <img loading="lazy" src="/images/implementation/interaction3.png#center" width="500px"/> 
+</figure>
+</p>
+<h1 id="3-ui-redesign"><strong>3. UI Redesign</strong><a hidden class="anchor" aria-hidden="true" href="#3-ui-redesign">#</a></h1>
+<p>To further mimic the look and feel of Super Mario Sunshine, I also redesigned the UI. For this, I downloaded UI sprites from the <a href="https://www.mariowiki.com/Super_Mario_Sunshine">Mario Wiki</a>, incorporating them into the project to create a more authentic visual experience. Specifically, I used the coin and red coin sprites, tilting them slightly along with the timer to match their appearance in the original game. Additionally, I incorporated sprites for the different nozzles, providing users with visual feedback when cycling through them, making it clear which nozzle is currently equipped. I also included the water tank sprite, pairing it with a visual representation of the internal float value. This ensures that players can easily monitor their remaining water supply and know when they need to refill.
+<figure class="align-center ">
+    <img loading="lazy" src="/images/implementation/ui.png#center" width="500px"/> 
+</figure>
+</p>
+<h1 id="4-miscellaneous"><strong>4. Miscellaneous</strong><a hidden class="anchor" aria-hidden="true" href="#4-miscellaneous">#</a></h1>
+<p>Using ProBuilder, I recreated the iconic green pipes seen in almost every Mario game. These pipes serve as obstacles that players must overcome by utilizing the various FLUDD abilities, adding a classic platforming challenge to the experience.
+<figure class="align-center ">
+    <img loading="lazy" src="/images/implementation/obstacle1.png#center" width="500px"/> 
+</figure>
+
+To further emphasize the platforming aspect, several map adjustments were made. Some platforms were elevated, requiring players to use different FLUDD nozzles to navigate the environment. This design choice encourages varied gameplay and ensures that players engage with all available movement mechanics.</p>
+<figure class="align-center ">
+    <img loading="lazy" src="/images/implementation/obstacle2.png#center" width="500px"/> 
+</figure>
+
+<p>Since every Mario level features eight red coins that can be collected to earn an extra Star or Shine, I added red coins throughout the course as a fun side objective for the player. To implement this, I duplicated the existing coin prefab and modified it by changing the material color of both the coin itself and the glowing effect surrounding it to red.
+<figure class="align-center ">
+    <img loading="lazy" src="/images/implementation/obstacle3.png#center" width="500px"/> 
+</figure>
+
+Additionally, to further enhance the authentic Mario atmosphere, I replaced the background music with the Super Mario Sunshine OST, making the experience feel even more like a real Mario level.</p>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+    </ul>
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2025 <a href="http://localhost:1313/">IVAR Project SMS</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu')
+    if (menu) {
+        menu.scrollLeft = localStorage.getItem("menu-scroll-position");
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        if (document.body.className.includes("dark")) {
+            document.body.classList.remove('dark');
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            document.body.classList.add('dark');
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+</body>
+
+</html>

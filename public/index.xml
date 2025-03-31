@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>IVAR Project SMS</title>
+    <link>http://localhost:1313/</link>
+    <description>Recent content on IVAR Project SMS</description>
+    <generator>Hugo -- 0.145.0</generator>
+    <language>en-us</language>
+    <atom:link href="http://localhost:1313/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Introduction &amp; Motivation</title>
+      <link>http://localhost:1313/post/intro/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/post/intro/</guid>
+      <description>&lt;p&gt;Having some experience with Unity development, particularly in creating a creative space in a multiplayer scenario as a sort of game as part of my bachelor’s thesis, I have always wanted to expand my skills and explore new topics in greater depth. In the winter semester of 2024/2025, I had the opportunity to participate in the lecture &lt;em&gt;Interaction in Virtual and Augmented Reality&lt;/em&gt;.&lt;/p&gt;
+&lt;p&gt;The goal of this lecture was to implement a locomotion technique that allows movement within a 3D environment, as well as an interaction technique enabling users to interact with objects in the virtual world. To apply our knowledge, we were provided with a template Unity project featuring a parkour course that users needed to traverse while interacting with various objects. In addition to that we were given Meta Quest Headsets to be able to develop, test and run our projects on this device.&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>Problem Statement &amp; Solution</title>
+      <link>http://localhost:1313/post/problem-statement/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/post/problem-statement/</guid>
+      <description>&lt;h1 id=&#34;problem-statement&#34;&gt;&lt;strong&gt;Problem Statement&lt;/strong&gt;&lt;/h1&gt;
+&lt;p&gt;As part of the lecture, we were tasked with implementing both a locomotion and an object interaction technique using the virtual reality headsets.
+The locomotion technique needed to allow users to traverse a parkour course, passing through several checkpoints while attempting to complete it in the shortest time possible. A good locomotion technique is considered intuitive for the user, causes little to no cybersickness, and provides an efficient means of travel. The object interaction technique, on the other hand, was required to enable users to select objects and manipulate their position and rotation along all axes within a 3D space.&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>Implementation Details</title>
+      <link>http://localhost:1313/post/implementation-details/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/post/implementation-details/</guid>
+      <description>&lt;p&gt;&lt;strong&gt;IMPORTANT NOTE:&lt;/strong&gt; Since I incorporated a few assets from the original game, it is important to clarify upfront that all rights to the assets and also any images used in this project are reserved by Nintendo. This project was created solely for study and learning purposes and will not be used for any commercial activities.&lt;/p&gt;
+&lt;h1 id=&#34;1-locomotion-implementation&#34;&gt;&lt;strong&gt;1. Locomotion Implementation&lt;/strong&gt;&lt;/h1&gt;
+&lt;p&gt;The initial idea for the locomotion technique was to implement the &lt;strong&gt;Hover Nozzle&lt;/strong&gt; as the first movement ability. However, for this to work, the user first needed a way to gain height before activating the hover. To achieve this, I decided to implement a classic Mario-style jump.&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>Evaluation &amp; Conclusion</title>
+      <link>http://localhost:1313/post/evaluation/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/post/evaluation/</guid>
+      <description>&lt;p&gt;&lt;strong&gt;Evaluation Setup&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;As part of the course, we were asked to conduct a small user study to gather feedback on our implementation. This study required at least two participants to test our project using virtual reality headsets, traverse the parkour course, and complete the interaction tasks. Besides myself I had two individuals participating in my study &lt;strong&gt;(n = 3)&lt;/strong&gt;.&lt;/p&gt;
+&lt;p&gt;Before starting the main task, participants were given a few minutes to get comfortable with the VR environment and the controls. During this &amp;ldquo;warum-up&amp;rdquo; I explained to them the interaction tasks they were about to solve so they had a general idea of what they have to do. Once comfortable, they were tasked with traversing the course, completing the interaction challenges, and collecting as many coins as possible. Afterward, I analyzed various metrics collected during gameplay, processing them into a structured format to draw meaningful conclusions.&lt;/p&gt;</description>
+    </item>
+  </channel>
+</rss>
